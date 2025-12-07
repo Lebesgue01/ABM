@@ -8,7 +8,24 @@
   html,body,#map{height:100%;margin:0;padding:0}
   .control-panel{position:absolute;top:10px;left:10px;z-index:1000;background:rgba(255,255,255,0.97);padding:10px;border-radius:6px;max-width:520px;font-family:Arial,sans-serif;font-size:13px}
   .filter-block{margin-bottom:8px}
-  #log{position:absolute;right:10px;bottom:10px;width:360px;max-height:240px;overflow:auto;background:rgba(0,0,0,0.75);color:#fff;padding:8px;font-family:monospace;font-size:12px;border-radius:6px;z-index:1000}
+/* small fixed credit (remplace le log dynamique) */
+#log{
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 1000;
+  background: rgba(255,255,255,0.92);
+  color: #111;
+  padding: 6px 10px;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  pointer-events: auto;
+  white-space: nowrap;
+}
+#log a { color: #0b66c3; text-decoration: none; font-weight: 600; }
+#log a:hover { text-decoration: underline; }
   .small{font-size:11px;color:#555}
   .modal { position: absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:2000; background: white; padding:12px; border-radius:8px; box-shadow:0 6px 30px rgba(0,0,0,0.4); display:none; width:360px; }
   .modal h4{margin:0 0 8px 0;font-size:15px}
@@ -32,35 +49,35 @@
   <div class="filter-block"><strong>Year</strong><br/>
     <input id="year_min" type="number" placeholder="min" style="width:85px"/> - <input id="year_max" type="number" placeholder="max" style="width:85px"/>
   </div>
-  <div class="filter-block"><strong>Taille des marqueurs</strong><br/>
+  <div class="filter-block"><strong>Size</strong><br/>
     Multiplier: <input id="scale_mult" type="range" min="1" max="12" value="3"/> <span id="scale_val">3</span>
   </div>
-  <div class="filter-block"><strong>Opacité portée</strong><br/>
-    Opacité: <input id="range_op" type="range" min="0" max="1" step="0.05" value="0.25"/> <span id="op_val">0.25</span>
+  <div class="filter-block"><strong>Opacity range</strong><br/>
+    Opacity: <input id="range_op" type="range" min="0" max="1" step="0.05" value="0.25"/> <span id="op_val">0.25</span>
   </div>
     <div class="filter-block">
     <strong>Affichages</strong><br/>
-    <label><input id="show_connections" type="checkbox" checked/> montrer les lignes id↔id</label><br/>
-    <label><input id="show_orbits" type="checkbox" checked/> montrer les orbites satellites (virtuelles)</label><br/>
-    <label><input id="animate_sat" type="checkbox" checked/> animer les satellites & ships</label><br/>
-    <label><input id="show_all_ranges" type="checkbox" /> afficher toutes les portées RADAR</label><br/>
+    <label><input id="show_connections" type="checkbox" checked/> Show id↔id lines</label><br/>
+    <label><input id="show_orbits" type="checkbox" checked/> Show satellite orbites</label><br/>
+    <label><input id="animate_sat" type="checkbox" checked/> Animate satellites & ships</label><br/>
+    <label><input id="show_all_ranges" type="checkbox" /> Show all RADAR ranges</label><br/>
   </div>
 
 
   <!-- missile place button -->
   <div class="filter-block">
     <button id="place_missile_btn">Place ballistic missile</button>
-    <div class="small">Choisir un lieu pré-géocodé</div>
+    <div class="small">Chose a geocoded place</div>
   </div>
 
-  <div style="margin-top:6px;"><button id="reset">Réinitialiser</button></div>
+  <div style="margin-top:6px;"><button id="reset">Reinitialize</button></div>
 </div>
 
 <!-- modal: place missile -->
 <div id="missile_modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
   <h4>Place ballistic missile</h4>
   <div class="row">
-    <label for="missile_place_input">Lieu (autocomplétion):</label>
+    <label for="missile_place_input">Place (autocompletion):</label>
     <input id="missile_place_input" list="geo_datalist" placeholder="start typing..."/>
     <datalist id="geo_datalist"></datalist>
   </div>
@@ -93,7 +110,9 @@
   </div>
 </div>
 
-<div id="log" aria-live="polite"></div>
+<div id="log" aria-hidden="false">
+  Map developed by <a href="https://github.com/Lebesgue01" target="_blank" rel="noopener noreferrer">@Lebesgue01</a>
+</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -120,7 +139,10 @@ const ONEGA_LON = 38.0833333;
 const SUCCESS_PROB_SMALL = 0.5;
 const SUCCESS_PROB_LARGE = 0.1;
 
-function log(msg){ const b=document.getElementById('log'); const d=document.createElement('div'); d.textContent = new Date().toISOString() + " - " + msg; b.prepend(d); }
+function log(msg){
+  // logs still available in browser console for debugging, but not shown on the map UI
+  try { console.log(new Date().toISOString() + " - " + msg); } catch(e) {}
+}
 function safeText(s){ return (s===null||s===undefined) ? '' : String(s); }
 
 /* Compute great-circle-ish sector points (used previously) */
@@ -164,7 +186,7 @@ function buildSystemControls(){
   selCats.forEach(cat => {
     const systems = Object.keys(HIER[cat] || {}).sort();
     if(systems.length === 0) return;
-    const details = document.createElement('details'); details.open = true;
+    const details = document.createElement('details'); details.open = false;
     const summary = document.createElement('summary'); summary.textContent = cat + " → systems";
     details.appendChild(summary);
     const div = document.createElement('div'); div.style.marginLeft = '12px';
@@ -179,6 +201,18 @@ function buildSystemControls(){
 }
 function buildSubtypeControls(){
   const subContainer = document.getElementById('subtype-container'); subContainer.innerHTML = '';
+
+  // wrapper details (collapsed by default)
+  const wrapper = document.createElement('details');
+  wrapper.open = false;
+  const summary = document.createElement('summary');
+  summary.textContent = "Subtypes (déplier pour filtrer)";
+  wrapper.appendChild(summary);
+
+  const inner = document.createElement('div');
+  inner.style.marginLeft = '12px';
+  wrapper.appendChild(inner);
+
   const selSystems = Array.from(document.querySelectorAll('input.system_name:checked')).map(n => ({category:n.dataset.category, system:n.value}));
   const subtypeSet = new Set();
   selSystems.forEach(o => {
@@ -186,12 +220,17 @@ function buildSubtypeControls(){
     arr.forEach(s => { if(s !== '') subtypeSet.add(s); });
   });
   const arr = Array.from(subtypeSet).sort();
-  if(arr.length === 0){ subContainer.innerHTML = "<div class='small'>(aucun subtype trouvé)</div>"; return; }
-  arr.forEach(s => {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = `<label><input type="checkbox" class="subtype" value="${s}" checked/> ${s}</label>`;
+  if(arr.length === 0){
+    inner.innerHTML = "<div class='small'>(aucun subtype trouvé)</div>";
     subContainer.appendChild(wrapper);
+    return;
+  }
+  arr.forEach(s => {
+    const wrapperChk = document.createElement('div');
+    wrapperChk.innerHTML = `<label><input type="checkbox" class="subtype" value="${s}" checked/> ${s}</label>`;
+    inner.appendChild(wrapperChk);
   });
+  subContainer.appendChild(wrapper);
 }
 
 /* small helper to find Moscow coords in GEOCODES (fallback to fixed coord) */
