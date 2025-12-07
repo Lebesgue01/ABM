@@ -553,9 +553,47 @@ html_template = r"""
     <button id="place_mamba_btn">Add SAMP/T Mamba</button>
     <div class="small">Select a geocode location (use the list)</div>
   </div>
+    <div class="filter-block">
+    <button id="place_arrow_btn">Add Arrow-3</button>
+    <div class="small">Israeli system — placement only inside Israel</div>
+  </div>
+
+  <div class="filter-block">
+    <button id="place_david_btn">Add David's Sling</button>
+    <div class="small">Israeli system — placement only inside Israel</div>
+  </div>
+
+
 
   <div style="margin-top:6px;"><button id="reset">Reinitialize</button></div>
 </div>
+
+<!-- modal: place arrow -->
+<div id="arrow_modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <h4>Add Arrow-3</h4>
+  <div class="row">
+    <label for="arrow_place_input">Location (use geocode list):</label>
+    <input id="arrow_place_input" list="geo_datalist" placeholder="type to search..."/>
+  </div>
+  <div class="row">
+    <button id="arrow_place_confirm" class="btn">Add</button>
+    <button id="arrow_place_cancel" class="btn">Cancel</button>
+  </div>
+</div>
+
+<!-- modal: place david -->
+<div id="david_modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <h4>Add David's Sling</h4>
+  <div class="row">
+    <label for="david_place_input">Location (use geocode list):</label>
+    <input id="david_place_input" list="geo_datalist" placeholder="type to search..."/>
+  </div>
+  <div class="row">
+    <button id="david_place_confirm" class="btn">Add</button>
+    <button id="david_place_cancel" class="btn">Cancel</button>
+  </div>
+</div>
+
 
 <!-- modal: place missile -->
 <div id="missile_modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
@@ -583,6 +621,7 @@ html_template = r"""
     <button id="mamba_place_cancel" class="btn">Cancel</button>
   </div>
 </div>
+
 
 
 <!-- modal: launch missile -->
@@ -817,6 +856,11 @@ document.addEventListener('DOMContentLoaded', function(){
   const missileLayer = L.layerGroup([], { pane: 'markersPane' }).addTo(map);
     // Mamba layer (persistent)
   const mambaLayer = L.layerGroup([], { pane: 'markersPane' }).addTo(map);
+  const arrowLayer = L.layerGroup([], { pane: 'markersPane' }).addTo(map);
+const davidLayer = L.layerGroup([], { pane: 'markersPane' }).addTo(map);
+
+  const adTempRangeLayer = L.layerGroup([], { pane: 'rangesPane' }).addTo(map);
+
 
   // ABM ranges layer (always visible)
   const abmRangeLayer = L.layerGroup([], { pane: 'rangesPane' }).addTo(map);
@@ -850,26 +894,174 @@ document.addEventListener('DOMContentLoaded', function(){
   const defenseMissileDivIcon = makeImgDivIcon(DEFENSE_MISSILE_ICON_URL, 36, "🚀");
   // --------------- MAMBA (inside DOMContentLoaded, AFTER map, layers and findGeocodeByName) ---------------
 
-// Single definition for MAMBA icon + allowed countries
-const MAMBA_ICON_SIZE = 44;
-const MAMBA_SVG_URL_ACTUAL = "icons/mamba.svg"; // -> vérifie le chemin relatif depuis index.html
-const MAMBA_ALLOWED_COUNTRIES = ['france','italy','ukraine','singapore','denmark'];
+// ---------- AD systems: Mamba / Arrow-3 / David's Sling ----------
 
-// Prefer L.icon for SVGs (no onerror fallback replacing with emoji)
+// Icon sizes and SVG paths (adjust if needed: files must exist under docs/icons/ if index.html is in docs/)
+const AD_ICON_SIZE = 44;
+const MAMBA_SVG_URL_ACTUAL = "icons/mamba.svg";      // already used
+const ARROW_SVG = "icons/arrow.svg";                // put your Arrow-3 SVG here
+const DAVID_SVG = "icons/david.svg";                // put your David's Sling SVG here
+
+// Allowed-country lists
+const MAMBA_ALLOWED_COUNTRIES = ['france','italy','ukraine','singapore','denmark'];
+const ISRAEL_ALLOWED = ['israel','germany'];
+
+// Prefer L.icon for SVGs (browser will load SVG normally)
 const mambaIcon = L.icon({
   iconUrl: MAMBA_SVG_URL_ACTUAL,
-  iconSize: [MAMBA_ICON_SIZE, MAMBA_ICON_SIZE],
-  iconAnchor: [Math.round(MAMBA_ICON_SIZE/2), Math.round(MAMBA_ICON_SIZE/2)],
-  popupAnchor: [0, -Math.round(MAMBA_ICON_SIZE/2)],
+  iconSize: [AD_ICON_SIZE, AD_ICON_SIZE],
+  iconAnchor: [Math.round(AD_ICON_SIZE/2), Math.round(AD_ICON_SIZE/2)],
+  popupAnchor: [0, -Math.round(AD_ICON_SIZE/2)],
   className: 'mamba-l-icon'
 });
 
-// Ensure mambaLayer exists (you already create earlier, but safe-guard)
-if (typeof mambaLayer === 'undefined' || !mambaLayer) {
-  window.mambaLayer = L.layerGroup([], { pane: 'markersPane' }).addTo(map);
+const arrowIcon = L.icon({
+  iconUrl: ARROW_SVG,
+  iconSize: [AD_ICON_SIZE, AD_ICON_SIZE],
+  iconAnchor: [Math.round(AD_ICON_SIZE/2), Math.round(AD_ICON_SIZE/2)],
+  popupAnchor: [0, -Math.round(AD_ICON_SIZE/2)],
+  className: 'ad-arrow-icon'
+});
+
+const davidIcon = L.icon({
+  iconUrl: DAVID_SVG,
+  iconSize: [AD_ICON_SIZE, AD_ICON_SIZE],
+  iconAnchor: [Math.round(AD_ICON_SIZE/2), Math.round(AD_ICON_SIZE/2)],
+  popupAnchor: [0, -Math.round(AD_ICON_SIZE/2)],
+  className: 'ad-david-icon'
+});
+
+// helper: substring country allowed check
+function isNameAllowedFor(name, allowedArr){
+  if(!name) return false;
+  const s = String(name).toLowerCase();
+  for (let a of allowedArr) {
+    if (s.indexOf(a) !== -1) return true;
+  }
+  return false;
 }
 
-// Open modal
+// robust create function: uses unique id for remove button and attaches on popupopen
+// reusable create function (range shown only on hover or popup; remove button works reliably)
+
+// unified createADMarker: supports multiple ranges (array of {radiusMeters, color, label, fillOpacity})
+function createADMarker({ lat, lon, displayName, typeName, icon, rangeMeters, color, layer, ranges }) {
+  // create marker (not added to map only if layer provided - we add it to layer)
+  const marker = L.marker([lat, lon], { icon: icon, pane: 'markersPane', zIndexOffset: 2200 });
+
+  // prepare range circles (do NOT add them to the map yet)
+  const rangeCircles = [];
+  if (Array.isArray(ranges) && ranges.length > 0) {
+    // sort descending so we add the biggest first (then smaller overlays are visible above)
+    const sorted = ranges.slice().sort((a, b) => (b.radiusMeters - a.radiusMeters));
+    sorted.forEach(r => {
+      const c = L.circle([lat, lon], {
+        radius: Number(r.radiusMeters) || 0,
+        color: r.color || '#888',
+        fill: true,
+        fillOpacity: (r.fillOpacity !== undefined ? r.fillOpacity : 0.18),
+        weight: 1,
+        interactive: false,
+        pane: 'rangesPane'
+      });
+      c._ad_label = r.label || '';
+      rangeCircles.push(c);
+    });
+  } else if (rangeMeters) {
+    // backward compatible single range
+    const c = L.circle([lat, lon], {
+      radius: Number(rangeMeters) || 0,
+      color: color || '#888',
+      fill: true,
+      fillOpacity: 0.18,
+      weight: 1,
+      interactive: false,
+      pane: 'rangesPane'
+    });
+    c._ad_label = 'Range';
+    rangeCircles.push(c);
+  }
+
+  // unique id for the remove button
+  const removeId = 'remove_ad_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+
+  // build ranges html for popup (in English)
+  let rangesHtml = '';
+  if (Array.isArray(ranges) && ranges.length > 0) {
+    // list them in the original order (or sorted order if you prefer)
+    ranges.forEach(r => {
+      if (r && r.radiusMeters) {
+        const km = Math.round(Number(r.radiusMeters) / 1000);
+        rangesHtml += `${safeText(r.label || 'Range')}: ${km} km<br/>`;
+      }
+    });
+  } else if (rangeMeters) {
+    rangesHtml = `Range: ${Math.round(Number(rangeMeters) / 1000)} km<br/>`;
+  }
+
+  const popupHtml = `<strong>${safeText(displayName)}</strong><br/>Type: ${safeText(typeName)}<br/>${rangesHtml}<button id="${removeId}">Remove</button>`;
+  marker.bindPopup(popupHtml, { maxWidth: 360 });
+
+  // add marker to provided layer (or to map)
+  if (layer && layer.addLayer) layer.addLayer(marker); else marker.addTo(map);
+
+  // helpers to show/hide the group of range circles (use adTempRangeLayer as before)
+  function showRange() {
+    try {
+      rangeCircles.forEach(c => { if (!adTempRangeLayer.hasLayer(c)) adTempRangeLayer.addLayer(c); });
+    } catch (e) {}
+  }
+  function hideRange() {
+    try {
+      rangeCircles.forEach(c => { if (adTempRangeLayer.hasLayer(c)) adTempRangeLayer.removeLayer(c); });
+    } catch (e) {}
+  }
+
+  // show on hover, keep shown on popup open
+  marker.on('mouseover', function () {
+    showRange();
+    try { if (marker.bringToFront) marker.bringToFront(); } catch (e) {}
+  });
+  marker.on('mouseout', function () {
+    try { if (!marker.isPopupOpen()) hideRange(); } catch (e) {}
+  });
+
+  marker.on('popupopen', function () {
+    showRange();
+    // attach remove handler to unique button inside this popup
+    setTimeout(() => {
+      try {
+        const btn = document.getElementById(removeId);
+        if (btn && !btn._ad_remove_attached) {
+          btn._ad_remove_attached = true;
+          btn.addEventListener('click', function () {
+            try {
+              if (layer && layer.removeLayer) { layer.removeLayer(marker); }
+              else { try { map.removeLayer(marker); } catch (e) {} }
+              hideRange();
+            } catch (e) {}
+            try { marker.closePopup(); } catch (e) {}
+          });
+        }
+      } catch (e) {}
+    }, 10);
+  });
+
+  marker.on('popupclose', function () {
+    setTimeout(() => {
+      try { if (!marker._mouseOver) hideRange(); } catch (e) {}
+    }, 10);
+  });
+
+  // track mouse flag
+  marker.on('mouseover', function () { marker._mouseOver = true; });
+  marker.on('mouseout', function () { marker._mouseOver = false; });
+
+  return { marker, rangeCircles, showRange, hideRange };
+}
+
+
+// ---------------- MAMBA handlers (keep as before but using createADMarker for uniformity) ----------------
 document.getElementById('place_mamba_btn').addEventListener('click', function(){
   const modal = document.getElementById('mamba_modal');
   modal.style.display = 'block';
@@ -883,7 +1075,6 @@ document.getElementById('mamba_place_cancel').addEventListener('click', function
   modal.setAttribute('aria-hidden', 'true');
 });
 
-// Confirm add mamba (RELIES on findGeocodeByName being defined earlier in this same DOMContentLoaded)
 document.getElementById('mamba_place_confirm').addEventListener('click', function(){
   const q = document.getElementById('mamba_place_input').value.trim();
   const found = findGeocodeByName(q);
@@ -894,51 +1085,220 @@ document.getElementById('mamba_place_confirm').addEventListener('click', functio
   const name = found[0];
   const coords = found[1];
 
-  // country check (substring match)
-  const nameLower = String(name).toLowerCase();
-  let allowed = false;
-  for (let cc of MAMBA_ALLOWED_COUNTRIES) {
-    if (nameLower.indexOf(cc) !== -1) { allowed = true; break; }
-  }
-  if (!allowed) {
+  // country check
+  if (!isNameAllowedFor(name, MAMBA_ALLOWED_COUNTRIES)) {
     alert('This country is not equipped with SAMP/T Mamba');
     return;
   }
 
   const lat = Number(coords[0]), lon = Number(coords[1]);
+createADMarker({
+  lat,
+  lon,
+  displayName: "SAMP/T Mamba (" + name + ")",
+  typeName: "SAMP/T Mamba",
+  icon: mambaIcon,
+  // ranges: largest first will be added first internally (we also sort inside the function)
+  ranges: [
+    { radiusMeters: 150000, color: '#2ecc71', label: 'Aster-30 interception (150 km)', fillOpacity: 0.14 },
+    { radiusMeters: 60000,  color: '#1e8f46', label: 'Onboard radar detection (60 km)', fillOpacity: 0.22 }
+  ],
+  layer: mambaLayer
+});
 
-  // create mamba marker + 40km green circle
-  const marker = L.marker([lat, lon], { icon: mambaIcon, pane: 'markersPane', zIndexOffset: 2200 }).addTo(map);
-  const range = L.circle([lat, lon], {
-    radius: 40000,
-    color: '#2ecc71',
-    fill: true,
-    fillOpacity: 0.18,
-    weight: 1,
-    interactive: false,
-    pane: 'rangesPane'
-  }).addTo(map);
-
-  marker.bindPopup(`<strong>SAMP/T Mamba</strong><br/>Location: ${safeText(name)}<br/>Range: 40 km<br/><button id="remove_mamba_btn">Remove</button>`);
-  mambaLayer.addLayer(marker);
-  mambaLayer.addLayer(range);
-
-  // open popup then attach remove handler
-  marker.openPopup();
-  setTimeout(()=> {
-    try {
-      const btn = document.getElementById('remove_mamba_btn');
-      if (btn) btn.addEventListener('click', function(){
-        try { mambaLayer.removeLayer(marker); } catch(e){}
-        try { mambaLayer.removeLayer(range); } catch(e){}
-        map.closePopup();
-      });
-    } catch(e){}
-  }, 40);
-
-  // center map and close modal
   try { map.setView([lat, lon], Math.max(5, Math.min(10, map.getZoom()+2))); } catch(e){}
   const modal = document.getElementById('mamba_modal');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+});
+
+// ---------------- ARROW-3 handlers ----------------
+document.getElementById('place_arrow_btn').addEventListener('click', function(){
+  const modal = document.getElementById('arrow_modal');
+  modal.style.display = 'block';
+  modal.setAttribute('aria-hidden', 'false');
+  document.getElementById('arrow_place_input').value = '';
+  document.getElementById('arrow_place_input').focus();
+});
+document.getElementById('arrow_place_cancel').addEventListener('click', function(){
+  const modal = document.getElementById('arrow_modal');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+});
+document.getElementById('arrow_place_confirm').addEventListener('click', function(){
+  const q = document.getElementById('arrow_place_input').value.trim();
+  const found = findGeocodeByName(q);
+  if(!found){
+    alert('Location not found in geocodes.');
+    return;
+  }
+  const name = found[0], coords = found[1];
+
+  // must be in Israel
+  if (!isNameAllowedFor(name, ISRAEL_ALLOWED)) {
+    alert('This system can only be placed in Israel or Germany.');
+    return;
+  }
+
+  const lat = Number(coords[0]), lon = Number(coords[1]);
+createADMarker({
+  lat,
+  lon,
+  displayName: "Arrow-3 (" + name + ")",
+  typeName: "Arrow-3",
+  icon: arrowIcon,
+  ranges: [
+    { radiusMeters: 2000000, color: '#f7e9a7', label: 'Interception (2000 km)', fillOpacity: 0.12 }
+  ],
+  layer: arrowLayer
+});
+
+  try { map.setView([lat, lon], Math.max(5, Math.min(10, map.getZoom()+2))); } catch(e){}
+  const modal = document.getElementById('arrow_modal');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+});
+
+// ---------------- David's Sling handlers ----------------
+document.getElementById('place_david_btn').addEventListener('click', function(){
+  const modal = document.getElementById('david_modal');
+  modal.style.display = 'block';
+  modal.setAttribute('aria-hidden', 'false');
+  document.getElementById('david_place_input').value = '';
+  document.getElementById('david_place_input').focus();
+});
+document.getElementById('david_place_cancel').addEventListener('click', function(){
+  const modal = document.getElementById('david_modal');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+});
+document.getElementById('david_place_confirm').addEventListener('click', function(){
+  const q = document.getElementById('david_place_input').value.trim();
+  const found = findGeocodeByName(q);
+  if(!found){
+    alert('Location not found in geocodes.');
+    return;
+  }
+  const name = found[0], coords = found[1];
+
+  // must be in Israel
+  if (!isNameAllowedFor(name, ISRAEL_ALLOWED)) {
+    alert('This system can only be placed in Israel or Germany.');
+    return;
+  }
+
+  const lat = Number(coords[0]), lon = Number(coords[1]);
+createADMarker({
+  lat,
+  lon,
+  displayName: "David's Sling (" + name + ")",
+  typeName: "David's Sling",
+  icon: davidIcon,
+  ranges: [
+    { radiusMeters: 475000, color: '#d69f00', label: 'Detection (475 km)', fillOpacity: 0.16 }, // dark yellow
+    { radiusMeters: 40000,  color: '#f7e9a7', label: 'Interception (40 km)', fillOpacity: 0.22 }  // pale yellow on top
+  ],
+  layer: davidLayer
+});
+
+  try { map.setView([lat, lon], Math.max(5, Math.min(10, map.getZoom()+2))); } catch(e){}
+  const modal = document.getElementById('david_modal');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+});
+
+
+
+// helper: country check (substring match on geocode name)
+function isNameAllowedFor(name, allowedArr){
+  if(!name) return false;
+  const s = String(name).toLowerCase();
+  for (let a of allowedArr) {
+    if (s.indexOf(a) !== -1) return true;
+  }
+  return false;
+}
+
+// --- Mamba: keep your existing Mamba button/modal handlers (we assume you have them).
+// If you removed the old Mamba handler, re-create it similarly calling createADMarker()
+// with mambaIcon and mambaLayer, rangeMeters: 40000.
+
+// --- Arrow-3 handlers (open/close modal + confirm) ---
+document.getElementById('place_arrow_btn').addEventListener('click', function(){
+  const modal = document.getElementById('arrow_modal');
+  modal.style.display = 'block';
+  modal.setAttribute('aria-hidden', 'false');
+  document.getElementById('arrow_place_input').value = '';
+  document.getElementById('arrow_place_input').focus();
+});
+document.getElementById('arrow_place_cancel').addEventListener('click', function(){
+  const modal = document.getElementById('arrow_modal');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+});
+
+document.getElementById('arrow_place_confirm').addEventListener('click', function(){
+  const q = document.getElementById('arrow_place_input').value.trim();
+  const found = findGeocodeByName(q);
+  if(!found){
+    alert('Location not found in geocodes.');
+    return;
+  }
+  const name = found[0];
+  const coords = found[1];
+
+  // must be in Israel
+  if (!isNameAllowedFor(name, ISRAEL_ALLOWED)) {
+    alert('This system can only be placed in Israel or Germany.');
+    return;
+  }
+
+  const lat = Number(coords[0]), lon = Number(coords[1]);
+  createADMarker({ lat, lon, name: "Arrow-3 ("+name+")", icon: arrowIcon, rangeMeters: 100000, color: '#f1c40f', layer: arrowLayer });
+
+  // center and close modal
+  try { map.setView([lat, lon], Math.max(5, Math.min(10, map.getZoom()+2))); } catch(e){}
+  const modal = document.getElementById('arrow_modal');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+});
+
+// --- David's Sling handlers ---
+document.getElementById('place_david_btn').addEventListener('click', function(){
+  const modal = document.getElementById('david_modal');
+  modal.style.display = 'block';
+  modal.setAttribute('aria-hidden', 'false');
+  document.getElementById('david_place_input').value = '';
+  document.getElementById('david_place_input').focus();
+});
+document.getElementById('david_place_cancel').addEventListener('click', function(){
+  const modal = document.getElementById('david_modal');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+});
+
+document.getElementById('david_place_confirm').addEventListener('click', function(){
+  const q = document.getElementById('david_place_input').value.trim();
+  const found = findGeocodeByName(q);
+  if(!found){
+    alert('Location not found in geocodes.');
+    return;
+  }
+  const name = found[0];
+  const coords = found[1];
+
+  // must be in Israel
+  if (!isNameAllowedFor(name, ISRAEL_ALLOWED)) {
+    alert('This system can only be placed in Israel.');
+    return;
+  }
+
+  const lat = Number(coords[0]), lon = Number(coords[1]);
+  createADMarker({ lat, lon, name: "David's Sling ("+name+")", icon: davidIcon, rangeMeters: 60000, color: '#f1c40f', layer: davidLayer });
+
+  // center and close modal
+  try { map.setView([lat, lon], Math.max(5, Math.min(10, map.getZoom()+2))); } catch(e){}
+  const modal = document.getElementById('david_modal');
   modal.style.display = 'none';
   modal.setAttribute('aria-hidden', 'true');
 });
