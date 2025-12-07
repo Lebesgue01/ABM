@@ -18,7 +18,7 @@ from typing import Any, Optional, Tuple
 
 # --- CONFIG ---
 CSV_PATH = "cleaned_systems.csv"    # adapte si nécessaire
-OUT_HTML_PATH = "map_leaflet_ship_sat_anim_no_ship_circle_fast.html"
+OUT_HTML_PATH = "docs/index.html"
 MIN_RADIUS = 4
 BASE_RADIUS = max(1.0, MIN_RADIUS * 0.2)      # ~= MIN_RADIUS/5
 DEFAULT_SCALE = 3
@@ -480,7 +480,7 @@ GEOCODES_STR = sanitize_for_json_top(GEOCODES)
 html_template = r"""
 <!doctype html>
 <html>
-<head><meta charset="utf-8"/><title>Leaflet map — ships & satellites anim (missiles, Onega)</title>
+<head><meta charset="utf-8"/><title>Map of russian and american ABM defense facilities - 2025</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
@@ -516,7 +516,7 @@ html_template = r"""
 <body>
 <div id="map"></div>
 <div class="control-panel" id="controls">
-  <h4>Filtres</h4>
+  <h4>Filters</h4>
   <div class="filter-block"><strong>Category</strong><br/><div id="cat-container"></div></div>
   <div class="filter-block"><strong>System name</strong><br/><div id="system-container"></div></div>
   <div class="filter-block"><strong>Subtype</strong><br/><div id="subtype-container"></div></div>
@@ -685,7 +685,7 @@ function buildSubtypeControls(){
   const wrapper = document.createElement('details');
   wrapper.open = false;
   const summary = document.createElement('summary');
-  summary.textContent = "Subtypes (déplier pour filtrer)";
+  summary.textContent = "Subtypes";
   wrapper.appendChild(summary);
 
   const inner = document.createElement('div');

@@ -1,7 +1,7 @@
 
 <!doctype html>
 <html>
-<head><meta charset="utf-8"/><title>Leaflet map — ships & satellites anim (missiles, Onega)</title>
+<head><meta charset="utf-8"/><title>Map of russian and american ABM defense facilities - 2025</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
@@ -37,7 +37,7 @@
 <body>
 <div id="map"></div>
 <div class="control-panel" id="controls">
-  <h4>Filtres</h4>
+  <h4>Filters</h4>
   <div class="filter-block"><strong>Category</strong><br/><div id="cat-container"></div></div>
   <div class="filter-block"><strong>System name</strong><br/><div id="system-container"></div></div>
   <div class="filter-block"><strong>Subtype</strong><br/><div id="subtype-container"></div></div>
@@ -206,7 +206,7 @@ function buildSubtypeControls(){
   const wrapper = document.createElement('details');
   wrapper.open = false;
   const summary = document.createElement('summary');
-  summary.textContent = "Subtypes (déplier pour filtrer)";
+  summary.textContent = "Subtypes";
   wrapper.appendChild(summary);
 
   const inner = document.createElement('div');
