@@ -549,6 +549,11 @@ html_template = r"""
     <div class="small">Chose a geocoded place</div>
   </div>
 
+  <div class="filter-block">
+    <button id="place_mamba_btn">Add SAMP/T Mamba</button>
+    <div class="small">Select a geocode location (use the list)</div>
+  </div>
+
   <div style="margin-top:6px;"><button id="reset">Reinitialize</button></div>
 </div>
 
@@ -565,6 +570,20 @@ html_template = r"""
     <button id="missile_place_cancel" class="btn">Cancel</button>
   </div>
 </div>
+
+<!-- modal: place mamba -->
+<div id="mamba_modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <h4>Add SAMP/T Mamba</h4>
+  <div class="row">
+    <label for="mamba_place_input">Location (use geocode list):</label>
+    <input id="mamba_place_input" list="geo_datalist" placeholder="type to search..."/>
+  </div>
+  <div class="row">
+    <button id="mamba_place_confirm" class="btn">Add</button>
+    <button id="mamba_place_cancel" class="btn">Cancel</button>
+  </div>
+</div>
+
 
 <!-- modal: launch missile -->
 <div id="launch_modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
@@ -600,6 +619,7 @@ const GEOJSON = GEOJSON_PLACEHOLDER;
 const HIER = HIER_PLACEHOLDER;
 const CONNECTIONS = CONNECTIONS_PLACEHOLDER;
 const GEOCODES = GEOCODES_PLACEHOLDER;
+const MAMBA_SVG_URL = "icons/mamba.svg"
 const SAT_ICON_URL = "icons/satellite.svg";
 const SHIP_ICON_URL = "icons/battleship-ship-boat-army-military.svg";
 const MISSILE_ICON_URL = "icons/missile-1.svg";
@@ -744,7 +764,8 @@ function geocodeIsThreatGroup(name){
   } catch(e) { return false; }
 }
 
-
+  
+  
 document.addEventListener('DOMContentLoaded', function(){
   buildCategoryControls(); buildSystemControls(); buildSubtypeControls();
 
@@ -794,6 +815,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // missile layer (persistent)
   const missileLayer = L.layerGroup([], { pane: 'markersPane' }).addTo(map);
+    // Mamba layer (persistent)
+  const mambaLayer = L.layerGroup([], { pane: 'markersPane' }).addTo(map);
 
   // ABM ranges layer (always visible)
   const abmRangeLayer = L.layerGroup([], { pane: 'rangesPane' }).addTo(map);
@@ -825,7 +848,102 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   const defenseMissileDivIcon = makeImgDivIcon(DEFENSE_MISSILE_ICON_URL, 36, "🚀");
-  const defenseExplosionDivIcon = makeImgDivIcon(DEFENSE_EXPLOSION_ICON_URL, 80, "💥");
+  // --------------- MAMBA (inside DOMContentLoaded, AFTER map, layers and findGeocodeByName) ---------------
+
+// Single definition for MAMBA icon + allowed countries
+const MAMBA_ICON_SIZE = 44;
+const MAMBA_SVG_URL_ACTUAL = "icons/mamba.svg"; // -> vérifie le chemin relatif depuis index.html
+const MAMBA_ALLOWED_COUNTRIES = ['france','italy','ukraine','singapore','denmark'];
+
+// Prefer L.icon for SVGs (no onerror fallback replacing with emoji)
+const mambaIcon = L.icon({
+  iconUrl: MAMBA_SVG_URL_ACTUAL,
+  iconSize: [MAMBA_ICON_SIZE, MAMBA_ICON_SIZE],
+  iconAnchor: [Math.round(MAMBA_ICON_SIZE/2), Math.round(MAMBA_ICON_SIZE/2)],
+  popupAnchor: [0, -Math.round(MAMBA_ICON_SIZE/2)],
+  className: 'mamba-l-icon'
+});
+
+// Ensure mambaLayer exists (you already create earlier, but safe-guard)
+if (typeof mambaLayer === 'undefined' || !mambaLayer) {
+  window.mambaLayer = L.layerGroup([], { pane: 'markersPane' }).addTo(map);
+}
+
+// Open modal
+document.getElementById('place_mamba_btn').addEventListener('click', function(){
+  const modal = document.getElementById('mamba_modal');
+  modal.style.display = 'block';
+  modal.setAttribute('aria-hidden', 'false');
+  document.getElementById('mamba_place_input').value = '';
+  document.getElementById('mamba_place_input').focus();
+});
+document.getElementById('mamba_place_cancel').addEventListener('click', function(){
+  const modal = document.getElementById('mamba_modal');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+});
+
+// Confirm add mamba (RELIES on findGeocodeByName being defined earlier in this same DOMContentLoaded)
+document.getElementById('mamba_place_confirm').addEventListener('click', function(){
+  const q = document.getElementById('mamba_place_input').value.trim();
+  const found = findGeocodeByName(q);
+  if(!found){
+    alert('Location not found in geocodes.');
+    return;
+  }
+  const name = found[0];
+  const coords = found[1];
+
+  // country check (substring match)
+  const nameLower = String(name).toLowerCase();
+  let allowed = false;
+  for (let cc of MAMBA_ALLOWED_COUNTRIES) {
+    if (nameLower.indexOf(cc) !== -1) { allowed = true; break; }
+  }
+  if (!allowed) {
+    alert('This country is not equipped with SAMP/T Mamba');
+    return;
+  }
+
+  const lat = Number(coords[0]), lon = Number(coords[1]);
+
+  // create mamba marker + 40km green circle
+  const marker = L.marker([lat, lon], { icon: mambaIcon, pane: 'markersPane', zIndexOffset: 2200 }).addTo(map);
+  const range = L.circle([lat, lon], {
+    radius: 40000,
+    color: '#2ecc71',
+    fill: true,
+    fillOpacity: 0.18,
+    weight: 1,
+    interactive: false,
+    pane: 'rangesPane'
+  }).addTo(map);
+
+  marker.bindPopup(`<strong>SAMP/T Mamba</strong><br/>Location: ${safeText(name)}<br/>Range: 40 km<br/><button id="remove_mamba_btn">Remove</button>`);
+  mambaLayer.addLayer(marker);
+  mambaLayer.addLayer(range);
+
+  // open popup then attach remove handler
+  marker.openPopup();
+  setTimeout(()=> {
+    try {
+      const btn = document.getElementById('remove_mamba_btn');
+      if (btn) btn.addEventListener('click', function(){
+        try { mambaLayer.removeLayer(marker); } catch(e){}
+        try { mambaLayer.removeLayer(range); } catch(e){}
+        map.closePopup();
+      });
+    } catch(e){}
+  }, 40);
+
+  // center map and close modal
+  try { map.setView([lat, lon], Math.max(5, Math.min(10, map.getZoom()+2))); } catch(e){}
+  const modal = document.getElementById('mamba_modal');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+});
+
+
 
   // counters / timers
   let activeAttackingMissiles = 0;
