@@ -1,0 +1,74 @@
+id,system_id,system_name,category,subtype,location_name,latitude,longitude,number,operability,year_operational,range_km,specific,golden_dome,degree,azimuth,defaut_centroid,navy_point,death_zone
+0001,a235,A235,ABM,silo,Sofrino,56.181103,37.788003,12,operational,1995,900,,0,,,"66.417, 94.250",,False
+0002,a235,A235,ABM,silo,Lytkarino,55.577511,37.771575,16,operational,1995,900,,0,,,"66.417, 94.250",,False
+0003,a235,A235,ABM,silo,Korolev,55.878081,37.893472,12,operational,1995,900,,0,,,"66.417, 94.250",,False
+0004,a235,A235,ABM,silo,Skhodnya,55.901142,37.307861,16,operational,1995,900,,0,,,"66.417, 94.250",,False
+0005,a235,A235,ABM,silo,Vnukovo,55.625681,37.389558,12,operational,1995,900,,0,,,"66.417, 94.250",,False
+0006,a235,A235,ABM,silo,Sergiyev Posad,56.242503,38.574247,8,non-operational,1995,900,,0,,,"66.417, 94.250",,False
+0007,a235,A235,ABM,silo,Vnukovo,55.350322,36.483222,8,non-operational,1995,900,,0,,,"66.417, 94.250",,False
+0008,don2n,Don-2N,RADAR,Don-2N,Sofrino,56.1733,37.7691,1,operational,1996,2000,,0,360,,"66.417, 94.250",,False
+0009,usks,US-KS,SATELLITES,US-KS,,,,1,non-operational,1900,,,0,,,"66.417, 94.250",,False
+0010,29b6,2b96,RADAR,2b96,Kovylkino,53.9841,43.8427,1,operational,2013,3000,,0,180,185,"66.417, 94.250",,True
+0010,29b6,2b96,RADAR,RADARTRANSMITTERS,Gorodets,56.69328,43.48625,1,operational,2013,2,,0,180,185,"66.417, 94.250",,True
+0011,29b6,2b96,RADAR,2b96,Zeya,53.720556,127.074167,1,unsure,2013,3000,"Additional site assumed to be in construction",0,180,,"66.417, 94.250",,False
+0012,Daugava,Daryal,RADAR,Daugava,Olenogorsk,68.116564,33.919081,1,operational,1977,6000,,0,90,308,"66.417, 94.250",,False
+0013,Skrunda-1,Daryal,RADAR,Skrunda-1,Skrunda,56.728033,21.982806,1,non-operational,1991,6000,"Demolished 1995",0,90,308,"66.417, 94.250",,False
+0014,Hantsavichy,Daryal,RADAR,Hantsavichy,"Kleck-2 / Baranavichy",52.861661,26.467467,1,operational,2003,6000,"Volga radar; receiver coords; In operation",0,90,262.5,"66.417, 94.250",,False
+0015,Mukachevo,Daryal,RADAR,Mukachevo,Mukachevo,48.385156,22.800478,0,non-operational,1991,6000,"Transmitter; Daryal-UM; Demolished 2011",0,90,218,"66.417, 94.250",,False
+0016,Gabala,Daryal,RADAR,Gabala,Qabala,40.871283,47.808958,0,non-operational,1985,6000,"Transmitter; Daryal; Halted in 2012",0,90,162,"66.417, 94.250",,False
+0017,Pechora,Daryal,RADAR,Pechora,Pechora,65.210164,57.295383,0,operational,1984,6000,"Transmitter; Daryal; In operation",0,90,2,"66.417, 94.250",,False
+0018,Mishelevka,Daryal,RADAR,Mishelevka,"Usolye-Sibirskoye (Irkutsk)",52.855586,103.23165,0,non-operational,1984,6000,"Transmitter; Daryal-U; Demolished 2011; replaced by Voronezh",0,90,135,"66.417, 94.250",,False
+0019,Balkhash,Daryal,RADAR,Balkhash,"Sary Shagan",46.588744,74.466441,0,non-operational,1992,6000,"Daryal-U transmitter; receiver destroyed by fire 2004; ruined 2010",0,90,152,"66.417, 94.250",,False
+0020,Yeniseysk-15,Daryal,RADAR,Yeniseysk-15,Krasnoyarsk,57.868797,93.118683,0,non-operational,1987,6000,"Daryal-U transmitter; halted 1989 and dismantled",0,90,40,"66.417, 94.250",,False
+0021,Lekhtusi,Voronezh,RADAR,Voronezh-M,Lekhtusi,60.275458,30.545017,1,operational,2012,6000,"Fills gap in coverage caused by loss of Skrunda-1; Fully operational in 2012",0,,,"66.417, 94.250",,False
+0022,Armavir,Voronezh,RADAR,Voronezh-DM,Armavir,44.925105,40.983894,1,operational,2015,6000,"Two radars at this site; Fully operational April 2015",0,,,"66.417, 94.250",,False
+0023,Pionersky,Voronezh,RADAR,Voronezh-DM,Pionersky,54.857222,20.182222,1,operational,2014,6000,"Partially operational Nov 2011; fully operational 2014",0,,,"66.417, 94.250",,False
+0024,Mishelevka,Voronezh,RADAR,Voronezh-VP,"Mishelevka",52.855586,103.23165,1,operational,2015,6000,"Entered trials March 2012; fully operational since 2015",0,,,"66.417, 94.250",,False
+0025,Yeniseysk,Voronezh,RADAR,Voronezh-DM,"Near Yeniseysk",58.506111,92.046111,1,operational,2017,6000,"Fully operational December 2017",0,,,"66.417, 94.250",,False
+0026,Barnaul,Voronezh,RADAR,Voronezh-DM,"Near Barnaul",53.139194,83.68125,1,operational,2017,6000,"Fully operational December 2017",0,,,"66.417, 94.250",,False
+0027,Orsk,Voronezh,RADAR,Voronezh-M,"Near Orsk",51.273333,58.959167,1,operational,2017,6000,"Fully operational December 2017; attacked by Ukrainian drone on 26 May 2024",0,,,"66.417, 94.250",,False
+0028,Vorkuta,Voronezh,RADAR,Voronezh-M,"Near Vorkuta",67.613972,63.755417,1,non-operational,9999,6000,"Under construction (construction started)",0,,,"66.417, 94.250",,False
+0029,Olenegorsk,Voronezh,RADAR,Voronezh-VP,"Near Olenegorsk",68.090556,34.3275,1,non-operational,9999,6000,"Under construction (will replace Dnestr/Daugava)",0,,,"66.417, 94.250",,False
+0030,Sevastopol,Voronezh,RADAR,Voronezh-SM,Sevastopol,44.578889,33.386111,1,non-operational,9999,6000,"Planned (to replace Dnestr)",0,,,"66.417, 94.250",,False
+0031,Kubinka,Dunay,RADAR,RADARTRANSMITTERS,Kubinka,55.492,36.680278,1,operational,1968,2,,0,,,"66.417, 94.250",,False
+0031,Kubinka,Dunay,RADAR,Dunay-3M,Kubinka,55.480,36.648333,1,operational,1968,2500,,0,,,"66.417, 94.250",,False
+0032,Chekhov,Dunay,RADAR,RADARTRANSMITTERS,Chekhov,55.206667,37.294722,1,operational,1978,2,,0,,,"66.417, 94.250",,False
+0032,Chekhov,Dunay,RADAR,Dunay-3U,Chekhov,55.231111,37.296944,1,operational,1978,2500,,0,,,"66.417, 94.250",,False
+1900,Mishelevka,Dnepr,RADAR,Dnepr,"Mishelevka Radar Station, Irkutsk, Russia",52.877574,103.273323,1,operational,1976,6000,"Azimuth 70, 200; Operational.",0,30,135,"66.417, 94.250",,False
+1901,Mishelevka,Dnestr,RADAR,Dnestr-M,"Mishelevka Radar Station, Irkutsk, Russia",52.881511,103.266027,1,non-operational,1970,6000,"Azimuth 135; Dismantled 1970s. Replaced by Dnepr at new position.",0,30,135,"66.417, 94.250",,False
+1902,Mishelevka,Dnestr,RADAR,Dnestr,"Mishelevka Radar Station, Irkutsk, Russia",52.883013,103.258045,1,operational,1968,6000,"Azimuth 265; Modernised to an incoherent scatter radar; used for research since 1993.",0,30,265,"66.417, 94.250",,False
+1903,Mishelevka,Dnestr,RADAR,Dnestr,"Mishelevka Radar Station, Irkutsk, Russia",52.875787,103.256414,1,non-operational,1968,6000,"Azimuth 265; Decommissioned 1990s; Dismantled.",0,30,265,"66.417, 94.250",,False
+1904,Mishelevka,Dnestr,RADAR,Dnestr-M,"Mishelevka Radar Station, Irkutsk, Russia",52.874829,103.260791,1,operational,1972,6000,"Azimuth 135; Modernised to Dnepr 1976; Operational.",0,30,135,"66.417, 94.250",,False
+1905,Balkhash,Dnestr,RADAR,Dnestr,"Balkhash (Sary Shagan), Kazakhstan",46.607410,74.523304,1,non-operational,1967,6000,"Azimuth 270; Decommissioned September 1995; Dismantled.",0,30,270,"66.417, 94.250",,False
+1906,Balkhash,Dnestr,RADAR,Dnestr,"Balkhash (Sary Shagan), Kazakhstan",46.614574,74.523132,1,non-operational,1967,6000,"Azimuth 270; Decommissioned January 1984; Dismantled.",0,30,270,"66.417, 94.250",,False
+1907,Balkhash,Dnestr,RADAR,Dnestr-M,"Balkhash (Sary Shagan), Kazakhstan",46.625333,74.517210,1,non-operational,1971,6000,"Azimuth 60; Modernised to Dnepr 1974; Decommissioned January 1984; Dismantled.",0,30,60,"66.417, 94.250",,False
+1908,Balkhash,Dnestr,RADAR,Dnestr-M,"Balkhash (Sary Shagan), Kazakhstan",46.631463,74.512618,1,non-operational,1971,6000,"Azimuth 60; Modernised to Dnepr 1974; Decommissioned September 1988; Dismantled.",0,30,60,"66.417, 94.250",,False
+1909,Balkhash,Dnepr,RADAR,Dnepr,"Balkhash (Sary Shagan), Kazakhstan",46.603076,74.530985,1,non-operational,1972,6000,"Azimuth 180, 124; Dnepr 1968–1972; Decommissioned 2020.",0,30,202,"66.417, 94.250",,False
+1910,Olenegorsk,Dnestr,RADAR,Dnestr-M,"Olenegorsk-1, Kola Peninsula, Russia",68.114100,33.910200,1,operational,1968,6000,"Azimuth 323, 293; Modernised to Dnepr 1978; works with Daugava; Operational.",0,30,308,"66.417, 94.250",,False
+1911,Skrunda,Dnestr,RADAR,Dnestr-M,"Skrunda-1, Latvia",56.715176,21.963036,1,non-operational,1969,6000,"Azimuth 323, 293; Modernised to Dnepr 1979; Demolished 1999.",0,30,308,"66.417, 94.250",,False
+1912,Skrunda,Dnepr,RADAR,Dnepr,"Skrunda-1, Latvia",56.708200,21.941000,1,non-operational,1976,6000,"Azimuth 8, 248; Dnepr 1968–1976; Demolished 1999.",0,30,120,"66.417, 94.250",,False
+1913,Sevastopol,Dnepr,RADAR,Dnepr,"Sevastopol Radar Station, Crimea",44.578800,33.386200,1,non-operational,1979,6000,"Azimuth 172, 230; Dnepr 1968–1979; Closed 2009; To be replaced by Voronezh.",0,30,201,"66.417, 94.250",,False
+1914,Mukachevo,Dnepr,RADAR,Dnepr,"Mukachevo Radar Station, Zakarpattia Oblast, Ukraine",48.377689,22.707446,1,non-operational,1979,6000,"Azimuth 196, 260; Dnepr 1968–1979; Closed 2009; Derelict.",0,30,228,"66.417, 94.250",,False
+1915,Chernobyl,Duga,RADAR,Duga,Duga-1,51.305294,30.065931,1,non-operational,9999,,,0,,,"66.417, 94.250",,False
+1915,Chernobyl,Duga,RADAR,RADARTRANSMITTERS,Duga-1,51.637772,30.702892,1,non-operational,9999,2,,0,,,"66.417, 94.250",,False
+1916,Komsomolsk,Duga,RADAR,Duga,Duga-2,50.385550,137.328297,1,non-operational,9999,,,0,,,"66.417, 94.250",,False
+1916,Komsomolsk,Duga,RADAR,RADARTRANSMITTERS,Duga-2,50.892961,136.836772,1,non-operational,9999,2,,0,,,"66.417, 94.250",,False
+1850,Thisisjustatest,Lodka,SHIP,Lodka,Lodka-1,35,160,1,non-operational,9999,,,0,,,"66.417, 94.250",,False
+3001,capecod,"Cape Cod SFS",RADAR,SFS,"Cape Cod (MA, USA)",41.75,-70.533333,2,operational,9999,5600,"2 Faces; Face A: ~25° (NNE); Face B: ~145° (SE); Sector: 325°–205° (covers N & S Atlantic)",0,240,85,"39.833333, -98.583333",,False
+3002,beale,"Beale AFB SFS",RADAR,SFS,"Beale AFB (CA, USA)",39.133333,-121.35,2,operational,9999,5600,"2 Faces; Face A: ~235° (SW); Face B: ~355° (N); Sector: 175°–55° (covers Pacific & US West coast)",0,240,295,"39.833333, -98.583333",,False
+3003,pituffik,"Pituffik SB (Thule)",RADAR,SFS,"Pituffik SB (Greenland)",76.566667,-68.3,2,operational,9999,5600,"2 Faces; Face 1: ~67° (ENE); Face 2: ~307° (NW); Sector: 247°–127° (covers Arctic & Russia)",0,240,7,"39.833333, -98.583333",,False
+3004,clear,"Clear SFS (Alaska)",RADAR,SFS,"Clear (AK, USA)",64.283333,-149.183333,2,operational,9999,5600,"2 Faces; Face 1: ~295° (WNW); Face 2: ~55° (NE); Sector: 235°–115° (covers N Pacific & Arctic)",0,240,355,"39.833333, -98.583333",,False
+3005,fylingdales,"RAF Fylingdales",RADAR,SFS,"RAF Fylingdales (UK)",54.35,-0.666667,3,operational,9999,5600,"3 Faces; Face A: ~40°; Face B: ~160°; Face C: ~280°; Continuous coverage (3×120° overlapping) — effectively 360°",0,360,,"39.833333, -98.583333",,False
+3006,thule_fixed,Thule SFS,RADAR,AN/FPS-50,"Site I: Thule (Greenland)",76.566667,-68.300000,4,operational,,5500,"4 Antennes Fixes (AN/FPS-50); Boresights: 38°, 83°, 128°, 173°; Sector: 23°–167° (wide fan covering USSR via the pole)",0,144,95,"39.833333, -98.583333",,False
+3007,clear_fixed,Clear SFS,RADAR,AN/FPS-50,"Site II: Clear (Alaska)",64.283333,-149.183333,3,operational,,5500,"3 Antennes Fixes (AN/FPS-50); Boresights: 298°, 338°, 18°; Sector: 285°–55° (covers N Pacific & Siberia)",0,130,350,"39.833333, -98.583333",,False
+3008,fylingdales_rot,RAF Fylingdales,RADAR,AN/FPS-49,"Site III: Fylingdales (UK)",54.350000,-0.666667,3,operational,,5000,"3 Paraboles Rotatives (AN/FPS-49); Variable (mechanical); no fixed boresights; continuous 360° mechanical coverage",0,360,,"39.833333, -98.583333",,False
+1851,suez_aden,Suez-Aden Loop,SHIP,ROUTE,"Suez ↺ Aden (via Mer Rouge)",29.966667,32.550000,1,operational,,,,,,,,"29.966667,32.550000;28.386364,33.481818;26.806061,34.413636;25.225758,35.345455;23.645455,36.277273;22.065152,37.209091;20.484848,38.140909;18.904545,39.072727;17.324242,40.004545;15.743939,40.936364;14.163636,41.868182;12.583333,42.800000",False
+1852,korea,Korea Loop,SHIP,ROUTE,"Korea",29.966667,32.550000,1,operational,,,,,,,,"38.500000,131.000000;37.800000,131.300000;37.100000,131.600000;36.400000,131.900000;35.700000,132.200000;35.000000,132.500000;34.300000,132.800000;33.700000,132.900000;33.200000,132.800000;32.700000,132.700000",False
+1853,guam,Guam Loop,SHIP,ROUTE,"Guam",29.966667,32.550000,1,operational,,,,,,,,"13.472745,144.752018",False
+1854,greenland,Greenland Loop,SHIP,ROUTE,"Greenland",29.966667,32.550000,1,operational,,,,,,,,"59.773060,-43.922500;59.341480,-39.086520;58.735891,-34.395838;57.966244,-29.886814;57.044139,-25.585483;55.982100,-21.507761;54.792937,-17.660547;53.489237,-14.043340;52.083000,-10.650000",False
+1855,israel,Israel Loop,SHIP,ROUTE,"Israel",29.966667,32.550000,1,operational,,,,,,,,"34.433520,35.814150;33.888630,35.465480;33.559400,35.345600;33.270500,35.173800;33.093122,35.074767;32.794000,34.959600;32.085300,34.751800;31.800000,34.620000;31.669300,34.541500",False
+1856,alaska,Alaska Loop,SHIP,ROUTE,"Alaska",29.966667,32.550000,1,operational,,,,,,,,"60.000000,-151.000000;59.235714,-149.000000;58.471429,-147.000000;57.707143,-145.000000;56.942857,-143.000000;56.178571,-141.000000;55.414286,-139.000000;54.650000,-137.000000;53.885714,-135.000000;53.121429,-133.000000;52.357143,-131.000000;51.592857,-129.000000;50.828571,-127.000000;50.064286,-125.000000;49.300000,-123.000000",False
+4001,laverton,Laverton,RADAR,Rx,"Laverton (Western Australia)",-28.316667,122.000000,1,operational,2024,2000,"2 Bras (arrays) — forme en 'L' aplati; Bras A : ~300° (NW); Bras B : ~0° (N); Couverture estimée ~260°–40° (Indian Ocean, Indonesia, Sund Straight)",0,140,330,"66.417, 94.250",,True
+4002,longreach,Longreach,RADAR,Rx,"Longreach (Queensland)",-24.283333,143.183333,1,operational,2024,2000,"2 Bras (arrays) — forme en 'L' aplati; Bras A : ~350° (N); Bras B : ~60° (NE); Couverture estimée ~320°–100° (Papua, Solomon, Coral Sea)",0,140,355,"66.417, 94.250",,True
+4003,alicesprings,Alice Springs,RADAR,Rx,"Alice Springs (Northern Territory)",-23.516667,133.683333,1,operational,2024,2000,"1 Bras principal (site R&D historique); Boresight principal : ~340° (NNW); Couverture estimée ~290°–70° (TimTimuror, Arafura)",0,140,340,"66.417, 94.250",,True
+
