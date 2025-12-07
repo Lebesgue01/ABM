@@ -76,7 +76,7 @@
   </div>
     <div class="filter-block">
     <button id="place_arrow_btn">Add Arrow-3</button>
-    <div class="small">Israeli system — placement only inside Israel</div>
+    <div class="small">Israeli system — placement only inside Israel or Germany</div>
   </div>
 
   <div class="filter-block">
@@ -425,7 +425,8 @@ const DAVID_SVG = "icons/david.svg";                // put your David's Sling SV
 
 // Allowed-country lists
 const MAMBA_ALLOWED_COUNTRIES = ['france','italy','ukraine','singapore','denmark'];
-const ISRAEL_ALLOWED = ['israel','germany'];
+const ARROW_ALLOWED = ['israel','germany'];
+const DAVID_ALLOWED = ['israel'];
 
 // Prefer L.icon for SVGs (browser will load SVG normally)
 const mambaIcon = L.icon({
@@ -656,7 +657,7 @@ document.getElementById('arrow_place_confirm').addEventListener('click', functio
   const name = found[0], coords = found[1];
 
   // must be in Israel
-  if (!isNameAllowedFor(name, ISRAEL_ALLOWED)) {
+  if (!isNameAllowedFor(name, ARROW_ALLOWED)) {
     alert('This system can only be placed in Israel or Germany.');
     return;
   }
@@ -703,8 +704,8 @@ document.getElementById('david_place_confirm').addEventListener('click', functio
   const name = found[0], coords = found[1];
 
   // must be in Israel
-  if (!isNameAllowedFor(name, ISRAEL_ALLOWED)) {
-    alert('This system can only be placed in Israel or Germany.');
+  if (!isNameAllowedFor(name, DAVID_ALLOWED)) {
+    alert('This system can only be placed in Israel.');
     return;
   }
 
@@ -717,7 +718,13 @@ createADMarker({
   icon: davidIcon,
   ranges: [
     { radiusMeters: 475000, color: '#d69f00', label: 'Detection (475 km)', fillOpacity: 0.16 }, // dark yellow
-    { radiusMeters: 40000,  color: '#f7e9a7', label: 'Interception (40 km)', fillOpacity: 0.22 }  // pale yellow on top
+    {
+  radiusMeters: 40000,
+  color: 'red',            // ← bordure rouge visible
+  fillColor: '#f7e9a7',    // ← même couleur intérieure que le grand disque
+  fillOpacity: 0.22,
+  label: 'Interception (40 km)'
+}
   ],
   layer: davidLayer
 });
@@ -740,89 +747,7 @@ function isNameAllowedFor(name, allowedArr){
   return false;
 }
 
-// --- Mamba: keep your existing Mamba button/modal handlers (we assume you have them).
-// If you removed the old Mamba handler, re-create it similarly calling createADMarker()
-// with mambaIcon and mambaLayer, rangeMeters: 40000.
 
-// --- Arrow-3 handlers (open/close modal + confirm) ---
-document.getElementById('place_arrow_btn').addEventListener('click', function(){
-  const modal = document.getElementById('arrow_modal');
-  modal.style.display = 'block';
-  modal.setAttribute('aria-hidden', 'false');
-  document.getElementById('arrow_place_input').value = '';
-  document.getElementById('arrow_place_input').focus();
-});
-document.getElementById('arrow_place_cancel').addEventListener('click', function(){
-  const modal = document.getElementById('arrow_modal');
-  modal.style.display = 'none';
-  modal.setAttribute('aria-hidden', 'true');
-});
-
-document.getElementById('arrow_place_confirm').addEventListener('click', function(){
-  const q = document.getElementById('arrow_place_input').value.trim();
-  const found = findGeocodeByName(q);
-  if(!found){
-    alert('Location not found in geocodes.');
-    return;
-  }
-  const name = found[0];
-  const coords = found[1];
-
-  // must be in Israel
-  if (!isNameAllowedFor(name, ISRAEL_ALLOWED)) {
-    alert('This system can only be placed in Israel or Germany.');
-    return;
-  }
-
-  const lat = Number(coords[0]), lon = Number(coords[1]);
-  createADMarker({ lat, lon, name: "Arrow-3 ("+name+")", icon: arrowIcon, rangeMeters: 100000, color: '#f1c40f', layer: arrowLayer });
-
-  // center and close modal
-  try { map.setView([lat, lon], Math.max(5, Math.min(10, map.getZoom()+2))); } catch(e){}
-  const modal = document.getElementById('arrow_modal');
-  modal.style.display = 'none';
-  modal.setAttribute('aria-hidden', 'true');
-});
-
-// --- David's Sling handlers ---
-document.getElementById('place_david_btn').addEventListener('click', function(){
-  const modal = document.getElementById('david_modal');
-  modal.style.display = 'block';
-  modal.setAttribute('aria-hidden', 'false');
-  document.getElementById('david_place_input').value = '';
-  document.getElementById('david_place_input').focus();
-});
-document.getElementById('david_place_cancel').addEventListener('click', function(){
-  const modal = document.getElementById('david_modal');
-  modal.style.display = 'none';
-  modal.setAttribute('aria-hidden', 'true');
-});
-
-document.getElementById('david_place_confirm').addEventListener('click', function(){
-  const q = document.getElementById('david_place_input').value.trim();
-  const found = findGeocodeByName(q);
-  if(!found){
-    alert('Location not found in geocodes.');
-    return;
-  }
-  const name = found[0];
-  const coords = found[1];
-
-  // must be in Israel
-  if (!isNameAllowedFor(name, ISRAEL_ALLOWED)) {
-    alert('This system can only be placed in Israel.');
-    return;
-  }
-
-  const lat = Number(coords[0]), lon = Number(coords[1]);
-  createADMarker({ lat, lon, name: "David's Sling ("+name+")", icon: davidIcon, rangeMeters: 60000, color: '#f1c40f', layer: davidLayer });
-
-  // center and close modal
-  try { map.setView([lat, lon], Math.max(5, Math.min(10, map.getZoom()+2))); } catch(e){}
-  const modal = document.getElementById('david_modal');
-  modal.style.display = 'none';
-  modal.setAttribute('aria-hidden', 'true');
-});
 
 
 
