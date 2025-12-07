@@ -581,12 +581,12 @@ const GEOJSON = GEOJSON_PLACEHOLDER;
 const HIER = HIER_PLACEHOLDER;
 const CONNECTIONS = CONNECTIONS_PLACEHOLDER;
 const GEOCODES = GEOCODES_PLACEHOLDER;
-const SAT_ICON_URL = "docs/icons/satellite.svg";
-const SHIP_ICON_URL = "docs/icons/ship.svg";
-const MISSILE_ICON_URL = "docs/icons/missile.svg";
-const EXPLOSION_ICON_URL = "docs/icons/explosion.svg";
-const DEFENSE_MISSILE_ICON_URL = "docs/icons/def_missile.svg";
-const DEFENSE_EXPLOSION_ICON_URL = "docs/icons/def_expl.svg";
+const SAT_ICON_URL = "icons/satellite.svg";
+const SHIP_ICON_URL = "icons/battleship-ship-boat-army-military.svg";
+const MISSILE_ICON_URL = "icons/missile-1.svg";
+const EXPLOSION_ICON_URL = "icons/explosion.svg";
+const DEFENSE_MISSILE_ICON_URL = "icons/rocket-bomb.svg";
+const DEFENSE_EXPLOSION_ICON_URL = "icons/bomb-explosion.svg";
 const BASE_RADIUS = BASE_RADIUS_PLACEHOLDER;
 const MIN_RADIUS = MIN_RADIUS_PLACEHOLDER;
 const DEFAULT_SCALE = DEFAULT_SCALE_PLACEHOLDER;
@@ -1017,7 +1017,7 @@ function launchAttackingMissile(start, target, opts) {
 
   const pts = []; // entries: { pos: [lat,lon], layerPt: L.Point, idx: integer }
 
-  if (!targetIsRussia) {
+  if (!targetIsThreat) {
     // single segment in pixel space
     for (let k = 0; k <= steps; k++) {
       const t = k / steps;
@@ -1087,7 +1087,7 @@ function launchAttackingMissile(start, target, opts) {
 
   // Determine interceptIdx: for Russian targets must be EXACT index at ONEGA (by lat/lon)
   let interceptIdx = -1;
-  if (targetIsRussia) {
+  if (targetIsThreat) {
     // find the index where pos exactly equals ONEGA lat/lon (we pushed it exactly), fallback to nearest by layer distance
     for (let j = 0; j < pts.length; j++) {
       const p = pts[j].pos;
@@ -1117,8 +1117,8 @@ function launchAttackingMissile(start, target, opts) {
   const attackStartTime = performance.now();
   const attackArrivalTime = attackStartTime + interceptIdx * baseInterval;
 
-  // defender target — ensure we use the exact ONEGA position when targetIsRussia
-  const defTargetLayer = (targetIsRussia ? onegaLayer : pts[interceptIdx].layerPt);
+  // defender target — ensure we use the exact ONEGA position when targetIsThreat
+  const defTargetLayer = (targetIsThreat ? onegaLayer : pts[interceptIdx].layerPt);
   const defTargetLatLng = map.layerPointToLatLng(defTargetLayer);
   const defTarget = [defTargetLatLng.lat, defTargetLatLng.lng];
 
@@ -1136,7 +1136,7 @@ function launchAttackingMissile(start, target, opts) {
   let defenderStartTime = Math.round(attackArrivalTime - travelMs);
   let defenderStartOffset = Math.max(0, defenderStartTime - attackStartTime);
 
-  log("Launch: targetName='" + targetName + "' russia=" + targetIsRussia + " pts=" + pts.length +
+  log("Launch: targetName='" + targetName + "' russia=" + targetIsThreat + " pts=" + pts.length +
       " interceptIdx=" + interceptIdx + " attackOffset=" + Math.round(attackArrivalTime - attackStartTime) +
       " travelMs=" + travelMs + " defenderStartOffset=" + defenderStartOffset);
 
@@ -1195,7 +1195,7 @@ function launchAttackingMissile(start, target, opts) {
 
     // defender start & animate
         // Defender start (only for Russian targets)
-    if (targetIsRussia && !defenderStarted) {
+    if (targetIsThreat && !defenderStarted) {
       const elapsedSinceAttackStart = now - attackStartTime;
       if (elapsedSinceAttackStart >= defenderStartOffset) {
         defenderStarted = true;
@@ -1219,7 +1219,7 @@ function launchAttackingMissile(start, target, opts) {
           setTimeout(() => {
             if (attackAborted) return;
             let explLatLng;
-            if (targetIsRussia) {
+            if (targetIsThreat) {
               explLatLng = { lat: onegaLatLon[0], lng: onegaLatLon[1] };
             } else {
               const atkLayer = pts[interceptIdx].layerPt;
